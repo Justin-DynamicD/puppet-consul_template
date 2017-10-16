@@ -11,5 +11,4 @@ class consul_template::service {
     name   => 'consul-template',
   }
 
-
 }

@@ -110,7 +110,7 @@ class consul_template::config (
     }
   }
 
-  file { [$consul_template::config_dir, "${consul_template::config_dir}/config"]:
+  file { [$consul_template::config_dir, "${consul_template::config_dir}"]:
     ensure  => 'directory',
     purge   => $purge,
     recurse => $purge,
@@ -119,7 +119,7 @@ class consul_template::config (
     mode    => '0755',
   }
   -> concat { 'consul-template/config.json':
-    path   => "${consul_template::config_dir}/config/config.json",
+    path   => "${consul_template::config_dir}/config.json",
     owner  => $consul_template::user,
     group  => $consul_template::group,
     mode   => $consul_template::config_mode,

@@ -2,6 +2,7 @@
 #
 class consul_template::install {
 
+  #Create folder structure
   if ! empty($::consul_template::data_dir) {
     file { $::consul_template::data_dir:
       ensure => 'directory',
@@ -9,6 +10,18 @@ class consul_template::install {
       group  => $::consul_template::group,
       mode   => '0755',
     }
+  }
+  file {
+    "${::consul_template::bin_dir}":
+      ensure => 'directory',
+      owner  => $::consul_template::user,
+      group  => $::consul_template::group,
+      mode   => '0755';
+    "${::consul_template::template_dir}":
+      ensure => 'directory',
+      owner  => $::consul_template::user,
+      group  => $::consul_template::group,
+      mode   => '0755';
   }
 
   if $::consul_template::install_method == 'url' {
@@ -28,13 +41,14 @@ class consul_template::install {
       creates => "${::staging::path}/consul-template-${consul_template::version}/consul-template",
     }
     -> file {
-      "${::staging::path}/consul-template-${::consul_template::version}/consul-template":
-        owner => 'root',
-        group => 0, # 0 instead of root because OS X uses "wheel".
-        mode  => '0555';
       "${::consul_template::bin_dir}/consul-template":
+        source => "${::staging::path}/consul-template-${::consul_template::version}/consul-template",
+        owner  => $::consul_template::user,
+        group  => $::consul_template::group,
+        mode   => '0755';
+      "${::consul_template::link_dir}/consul-template":
         ensure => link,
-        target => "${::staging::path}/consul-template-${::consul_template::version}/consul-template";
+        target => "${::consul_template::bin_dir}/consul-template";
     }
 
   } elsif $::consul_template::install_method == 'package' {
