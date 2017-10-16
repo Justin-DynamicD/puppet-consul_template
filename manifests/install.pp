@@ -24,31 +24,32 @@ class consul_template::install {
       mode   => '0755';
   }
 
+  #Install binary
   if $::consul_template::install_method == 'url' {
 
-    include ::staging
-    if $::operatingsystem != 'darwin' {
-      ensure_packages(['tar'])
+    $ctzipname = "consul-template_${::consul_template::version}_${::consul_template::os}_${::consul_template::arch}.${::consul_template::download_extension}"
+    $ctcompleteurl = "${::consul_template::download_url_base}/${::consul_template::version}/$ctzipname"
+
+    archive { $ctzipname :
+      path          => "/tmp/${ctzipname}",
+      source        => $ctcompleteurl,
+      checksum      => ${::consul_template::download_checksum},
+      checksum_type => ${::consul_template::download_type},
+      extract       => true,
+      extract_path  => "${::consul_template::bin_dir}",
+      creates       => "${::consul_template::bin_dir}/consul-template",
+      cleanup       => true,
+      user          => $::consul_template::user,
+      group         => $::consul_template::group,
+      mode          => '0755',
+      require       => File['/etc/consul-template'],
     }
-    staging::file { "consul-template_${::consul_template::version}.${::consul_template::download_extension}":
-      source => $::consul_template::real_download_url,
-    }
-    -> file { "${::staging::path}/consul-template-${::consul_template::version}":
-      ensure => directory,
-    }
-    -> staging::extract { "consul-template_${::consul_template::version}.${::consul_template::download_extension}":
-      target  => "${::staging::path}/consul-template-${consul_template::version}",
-      creates => "${::staging::path}/consul-template-${consul_template::version}/consul-template",
-    }
-    -> file {
-      "${::consul_template::bin_dir}/consul-template":
-        source => "${::staging::path}/consul-template-${::consul_template::version}/consul-template",
-        owner  => $::consul_template::user,
-        group  => $::consul_template::group,
-        mode   => '0755';
-      "${::consul_template::link_dir}/consul-template":
-        ensure => link,
-        target => "${::consul_template::bin_dir}/consul-template";
+    if $::consul_template::link_dir != $::consul_template::bin_dir {
+      file { "${::consul_template::link_dir}/consul-template" :
+        ensure  => link,
+        target  => "${::consul_template::bin_dir}/consul-template",
+        require => Archive["${ctzipname}"],
+      }
     }
 
   } elsif $::consul_template::install_method == 'package' {

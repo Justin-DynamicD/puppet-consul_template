@@ -94,6 +94,8 @@ class consul_template (
   $os                    = $::consul_template::params::os,
   $download_url          = undef,
   $download_url_base     = $::consul_template::params::download_url_base,
+  $download_checksum     = $::consul_template::params::download_checksum,
+  $download_type         = $::consul_template::params::download_type,
   $download_extension    = $::consul_template::params::download_extension,
   $package_name          = $::consul_template::params::package_name,
   $package_ensure        = $::consul_template::params::package_ensure,
