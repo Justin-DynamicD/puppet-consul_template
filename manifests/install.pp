@@ -33,10 +33,10 @@ class consul_template::install {
     archive { $ctzipname :
       path          => "/tmp/${ctzipname}",
       source        => $ctcompleteurl,
-      checksum      => ${::consul_template::download_checksum},
-      checksum_type => ${::consul_template::download_type},
+      checksum      => $::consul_template::download_checksum,
+      checksum_type => $::consul_template::download_type,
       extract       => true,
-      extract_path  => "${::consul_template::bin_dir}",
+      extract_path  => $::consul_template::bin_dir,
       creates       => "${::consul_template::bin_dir}/consul-template",
       cleanup       => true,
       user          => $::consul_template::user,
