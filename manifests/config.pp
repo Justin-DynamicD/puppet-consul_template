@@ -110,7 +110,7 @@ class consul_template::config (
     }
   }
 
-  file { [$consul_template::config_dir, "${consul_template::config_dir}"]:
+  file { $::consul_template::config_dir:
     ensure  => 'directory',
     purge   => $purge,
     recurse => $purge,
