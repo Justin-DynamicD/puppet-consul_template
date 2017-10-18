@@ -41,7 +41,6 @@ class consul_template::install {
       cleanup       => true,
       user          => $::consul_template::user,
       group         => $::consul_template::group,
-      mode          => '0755',
       require       => File['/etc/consul-template'],
     }
     if $::consul_template::link_dir != $::consul_template::bin_dir {
