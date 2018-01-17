@@ -85,7 +85,15 @@ class consul_template::install {
           owner   => 'root',
           group   => 'root',
           content => template('consul_template/consul-template.systemd.erb'),
+          notify  => Exec['reloadconsultemplate']
         }
+        #deamon-reload if options get updated
+        exec { 'reloadconsultemplate' :
+          command     => 'systemctl daemon-reload',
+          path        => '/usr/bin:/usr/sbin:/bin',
+          refreshonly => true,
+        }
+
       }
       'sysv' : {
         file { '/etc/init.d/consul-template':
